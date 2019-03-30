@@ -13,4 +13,4 @@ Final project for my Android Course (Informal School of IT - Bucharest) - not fi
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 ##### first release presentation
-![alt text](https://raw.githubusercontent.com/babarusicristian/Travel-Journal/master/prezentare1.png)
+![alt text](https://raw.githubusercontent.com/babarusicristian/Simple-Travel-Journal/master/prezentare1.png)
