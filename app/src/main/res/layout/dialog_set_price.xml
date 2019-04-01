@@ -1,77 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/border_color"
+    android:background="@drawable/fundal_application_border"
     android:orientation="vertical"
     android:padding="@dimen/space_2">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/fundal_application"
-        android:orientation="vertical"
-        android:padding="@dimen/space_10"
+
+    <TextView
+        android:id="@+id/button_dialog_set"
+        android:layout_width="@dimen/space_zero"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="1"
+        android:background="@drawable/only_border"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:padding="@dimen/space_8"
+        android:text="@string/set"
+        android:textColor="@drawable/text_color_click"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_dialog_cancel"
+        app:layout_constraintTop_toBottomOf="@+id/edit_text_dialog_price" />
+
+    <TextView
+        android:id="@+id/button_dialog_cancel"
+        android:layout_width="@dimen/space_zero"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="4dp"
+        android:layout_weight="1"
+        android:background="@drawable/only_border"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:padding="@dimen/space_8"
+        android:text="@string/cancel"
+        android:textColor="@drawable/text_color_click"
+        app:layout_constraintBaseline_toBaselineOf="@+id/button_dialog_set"
+        app:layout_constraintEnd_toStartOf="@+id/button_dialog_set"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/texts_background_color"
+        android:gravity="center"
+        android:padding="@dimen/space_2"
+        android:text="@string/enter_the_trip_price_euro"
+        android:textSize="@dimen/font_16"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/texts_background_color"
-            android:gravity="center"
-            android:padding="@dimen/space_2"
-            android:text="@string/enter_the_trip_price_euro"
-            android:textSize="@dimen/font_16"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/edit_text_dialog_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/space_4"
-            android:drawableStart="@drawable/ic_euro_symbol"
-            android:drawablePadding="@dimen/space_4"
-            android:ems="10"
-            android:hint="@string/max_value"
-            android:inputType="number"
-            android:textColor="@drawable/text_color_click"
-            android:textSize="@dimen/font_16" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/button_dialog_cancel"
-                android:layout_width="@dimen/space_zero"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/space_4"
-                android:layout_weight="1"
-                android:background="@drawable/fundal_button2"
-                android:text="@string/cancel" />
-
-            <Button
-                android:id="@+id/button_dialog_set"
-                android:layout_width="@dimen/space_zero"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/space_4"
-                android:layout_weight="1"
-                android:background="@drawable/fundal_button2"
-                android:text="@string/set"
-                android:textStyle="bold" />
+    <EditText
+        android:id="@+id/edit_text_dialog_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:drawableStart="@drawable/ic_euro_symbol"
+        android:drawablePadding="@dimen/space_4"
+        android:ems="10"
+        android:hint="@string/max_value"
+        android:inputType="number"
+        android:textColor="@drawable/text_color_click"
+        android:textSize="@dimen/font_16"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

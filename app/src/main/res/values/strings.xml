@@ -57,6 +57,13 @@
     <string name="set">Set</string>
     <string name="cancel">Cancel</string>
     <string name="max_value">Max value</string>
-    <string name="enter_the_trip_price_euro">Set the trip price</string>
+    <string name="enter_the_trip_price_euro">Set new trip price</string>
+    <string name="wrong_end_date">Wrong END date, please correct it</string>
+    <string name="wrong_start_date">Wrong START date, please correct it</string>
+    <string name="photo_taken_removed">Photo taken removed</string>
+    <string name="required_field">Required field</string>
+    <string name="invalid_price">Invalid price</string>
+    <string name="out_of_range">Out of range</string>
+    <string name="failed_to_load_image">Failed! to load image:</string>
 
 </resources>

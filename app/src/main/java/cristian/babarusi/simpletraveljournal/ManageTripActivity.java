@@ -27,7 +27,6 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,6 +36,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.UUID;
@@ -178,53 +178,21 @@ public class ManageTripActivity extends AppCompatActivity {
                                     textDay = "" + dayOfMonth;
                                 }
 
-//                                //for use months with numbers
-//                                //cause is from 0 - 11
-//                                if ((monthOfYear + 1) < 10) {
-//                                    textMonth = "0" + (monthOfYear + 1);
-//                                } else {
-//                                    textMonth = "" + (monthOfYear + 1);
-//                                }
-
                                 //for use words on months
-                                switch (monthOfYear) {
-                                    case 0:
-                                        textMonth = "Jan";
-                                        break;
-                                    case 1:
-                                        textMonth = "Feb";
-                                        break;
-                                    case 2:
-                                        textMonth = "Mar";
-                                        break;
-                                    case 3:
-                                        textMonth = "Apr";
-                                        break;
-                                    case 4:
-                                        textMonth = "May";
-                                        break;
-                                    case 5:
-                                        textMonth = "Jun";
-                                        break;
-                                    case 6:
-                                        textMonth = "Jul";
-                                        break;
-                                    case 7:
-                                        textMonth = "Aug";
-                                        break;
-                                    case 8:
-                                        textMonth = "Sep";
-                                        break;
-                                    case 9:
-                                        textMonth = "Oct";
-                                        break;
-                                    case 10:
-                                        textMonth = "Nov";
-                                        break;
-                                    case 11:
-                                        textMonth = "Dec";
-                                        break;
+                                textMonth = getWordsOnMonth(monthOfYear, textMonth);
+
+                                //checking dates: start and end
+                                mDayStart = dayOfMonth;
+                                mMonthStart = monthOfYear;
+                                mYearStart = year;
+
+                                if (mYearStart > mYearEnd && mYearEnd != 0
+                                || mMonthStart > mMonthEnd && mMonthEnd != 0
+                                || mDayStart > mDayEnd && mDayEnd != 0) {
+                                        displayStartDateError();
+                                        return;
                                 }
+
                                 //do not format (it causes BUG)
                                 mButtonStartDate.setText(textDay + "/" + textMonth + "/" + year);
                             }
@@ -258,56 +226,23 @@ public class ManageTripActivity extends AppCompatActivity {
                                     textDay = "" + dayOfMonth;
                                 }
 
-//                                //for use months with numbers
-//                                //cause is from 0 - 11
-//                                if ((monthOfYear + 1) < 10) {
-//                                    textMonth = "0" + (monthOfYear + 1);
-//                                } else {
-//                                    textMonth = "" + (monthOfYear + 1);
-//                                }
-
                                 //for use words on months
-                                switch (monthOfYear) {
-                                    case 0:
-                                        textMonth = "Jan";
-                                        break;
-                                    case 1:
-                                        textMonth = "Feb";
-                                        break;
-                                    case 2:
-                                        textMonth = "Mar";
-                                        break;
-                                    case 3:
-                                        textMonth = "Apr";
-                                        break;
-                                    case 4:
-                                        textMonth = "May";
-                                        break;
-                                    case 5:
-                                        textMonth = "Jun";
-                                        break;
-                                    case 6:
-                                        textMonth = "Jul";
-                                        break;
-                                    case 7:
-                                        textMonth = "Aug";
-                                        break;
-                                    case 8:
-                                        textMonth = "Sep";
-                                        break;
-                                    case 9:
-                                        textMonth = "Oct";
-                                        break;
-                                    case 10:
-                                        textMonth = "Nov";
-                                        break;
-                                    case 11:
-                                        textMonth = "Dec";
-                                        break;
+                                textMonth = getWordsOnMonth(monthOfYear, textMonth);
+
+                                //checking dates: start and end
+                                mDayEnd = dayOfMonth;
+                                mMonthEnd = monthOfYear;
+                                mYearEnd = year;
+
+                                if (mYearStart > mYearEnd && mYearEnd != 0
+                                || mMonthStart > mMonthEnd && mMonthEnd != 0
+                                || mDayStart > mDayEnd && mDayEnd != 0) {
+                                    displayEndDateError();
+                                    return;
                                 }
+
                                 //do not format (it causes BUG)
                                 mButtonEndDate.setText(textDay + "/" + textMonth + "/" + year);
-
                             }
                         }, mYearEnd, mMonthEnd, mDayEnd);
                 datePickerDialog.show();
@@ -326,33 +261,39 @@ public class ManageTripActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loseEditTextsFocus();
 
-                if (mButtonSelectGalleryPhoto.getText().toString().equals(getString(R.string.select))) {
+                if (ContextCompat.checkSelfPermission(ManageTripActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
 
-                    //open gallery
-                    Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(galleryIntent, GALLERY_CODE);
-                    return;
-                }
+                    if (mButtonSelectGalleryPhoto.getText().toString().equals(getString(R.string.select))) {
 
-                if (mButtonSelectGalleryPhoto.getText().toString().equals(getString(R.string.remove))) {
+                        //open gallery
+                        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        startActivityForResult(galleryIntent, GALLERY_CODE);
+                        return;
+                    }
 
-                    mBitmapGallery = null;
+                    if (mButtonSelectGalleryPhoto.getText().toString().equals(getString(R.string.remove))) {
 
-                    //restore gallery opt
-                    mTextViewStatusGallery.setText(getString(R.string.no_image_file_selected));
-                    mTextViewStatusGallery.setTextColor(Color.parseColor("#990000")); //dark red
-                    mButtonSelectGalleryPhoto.setText(getString(R.string.select));
-                    mButtonSelectTakePicture.setEnabled(true);
-                    mTextViewStatusCamera.setVisibility(View.VISIBLE);
+                        mBitmapGallery = null;
 
-                    Toast.makeText(ManageTripActivity.this,
-                            getString(R.string.image_file_removed), Toast.LENGTH_SHORT).show();
-                    mButtonSelectGalleryPhoto.setText(R.string.select);
+                        //restore gallery opt
+                        mTextViewStatusGallery.setText(getString(R.string.no_image_file_selected));
+                        mTextViewStatusGallery.setTextColor(Color.parseColor("#990000")); //dark red
+                        mButtonSelectGalleryPhoto.setText(getString(R.string.select));
+                        mButtonSelectTakePicture.setEnabled(true);
+                        mTextViewStatusCamera.setVisibility(View.VISIBLE);
+
+                        Toast.makeText(ManageTripActivity.this,
+                                getString(R.string.image_file_removed), Toast.LENGTH_SHORT).show();
+                        mButtonSelectGalleryPhoto.setText(R.string.select);
+                    }
+
+                } else {
+                    //open specific fragment to ask for permission
+                    ActivityCompat.requestPermissions(ManageTripActivity.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, GALLERY_CODE);
                 }
             }
-
-
         });
 
         mButtonSelectTakePicture.setOnClickListener(new View.OnClickListener() {
@@ -388,7 +329,7 @@ public class ManageTripActivity extends AppCompatActivity {
                     mButtonSelectGalleryPhoto.setEnabled(true);
                     mTextViewStatusGallery.setVisibility(View.VISIBLE);
 
-                    Toast.makeText(ManageTripActivity.this, "Photo taken removed",
+                    Toast.makeText(ManageTripActivity.this, getString(R.string.photo_taken_removed),
                             Toast.LENGTH_SHORT).show();
                     mButtonSelectTakePicture.setText(R.string.select);
                 }
@@ -402,7 +343,11 @@ public class ManageTripActivity extends AppCompatActivity {
                 loseEditTextsFocus();
                 //TODO save button click
                 blockAllActivityProgressBar();
+
+                //temporar activate
                 uploadGalleryImageToStorage();
+                uploadCameraImageToStorage();
+
             }
         });
 
@@ -411,6 +356,7 @@ public class ManageTripActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View v) {
 
+                //TODO delete from storage
                 //storage reference for be DELETED
                 String refFromDB = "ebf46ec0-ce64-48a6-adce-1220b37aacc4.jpeg"; //ce este salvat in baza de date
                 String referencePath = mUsernameMail + "/" + refFromDB; //reformam path care a fost salvat la upload
@@ -458,6 +404,60 @@ public class ManageTripActivity extends AppCompatActivity {
         mTextViewStatusCamera = findViewById(R.id.text_view_status_camera);
     }
 
+    private void displayStartDateError() {
+        Toast.makeText(ManageTripActivity.this, getString(R.string.wrong_start_date),
+                Toast.LENGTH_SHORT).show();
+        mButtonStartDate.performClick();
+    }
+
+    private void displayEndDateError() {
+        Toast.makeText(ManageTripActivity.this, getString(R.string.wrong_end_date),
+                Toast.LENGTH_SHORT).show();
+        mButtonEndDate.performClick();
+    }
+
+    private String getWordsOnMonth(int monthOfYear, String textMonth) {
+        switch (monthOfYear) {
+            case 0:
+                textMonth = "Jan";
+                break;
+            case 1:
+                textMonth = "Feb";
+                break;
+            case 2:
+                textMonth = "Mar";
+                break;
+            case 3:
+                textMonth = "Apr";
+                break;
+            case 4:
+                textMonth = "May";
+                break;
+            case 5:
+                textMonth = "Jun";
+                break;
+            case 6:
+                textMonth = "Jul";
+                break;
+            case 7:
+                textMonth = "Aug";
+                break;
+            case 8:
+                textMonth = "Sep";
+                break;
+            case 9:
+                textMonth = "Oct";
+                break;
+            case 10:
+                textMonth = "Nov";
+                break;
+            case 11:
+                textMonth = "Dec";
+                break;
+        }
+        return textMonth;
+    }
+
     private void dialogSetPrice() {
 
         final Dialog theDialog = new Dialog(ManageTripActivity.this);
@@ -465,15 +465,30 @@ public class ManageTripActivity extends AppCompatActivity {
         theDialog.setContentView(R.layout.dialog_set_price);
         theDialog.setCancelable(false);
 
-        Button dialogButtonSet = theDialog.findViewById(R.id.button_dialog_set);
-        Button dialogButtonCancel = theDialog.findViewById(R.id.button_dialog_cancel);
-        EditText dialogEditText = theDialog.findViewById(R.id.edit_text_dialog_price);
+        TextView dialogButtonSet = theDialog.findViewById(R.id.button_dialog_set);
+        TextView dialogButtonCancel = theDialog.findViewById(R.id.button_dialog_cancel);
+        final EditText dialogEditText = theDialog.findViewById(R.id.edit_text_dialog_price);
         dialogEditText.setHint(getString(R.string.max_value) + " " + mSeekBarPrice.getMax());
 
         dialogButtonSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int maxVal = mSeekBarPrice.getMax();
 
+                //field verification
+                String text = dialogEditText.getText().toString();
+
+                if (text.isEmpty()) {
+                    dialogEditText.setError(getString(R.string.required_field));
+                } else if (text.startsWith("0")){
+                    dialogEditText.setError(getString(R.string.invalid_price));
+                } else if (!text.startsWith("0") && Integer.valueOf(text) > maxVal) {
+                    dialogEditText.setError(getString(R.string.out_of_range) + " (1 - " + maxVal + ")");
+                } else {
+                    mTextViewPrice.setText(text);
+                    mSeekBarPrice.setProgress(Integer.valueOf(text));
+                    theDialog.dismiss();
+                }
             }
         });
 
@@ -543,10 +558,51 @@ public class ManageTripActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ManageTripActivity.this,
-                            "Failed! to load image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            getString(R.string.failed_to_load_image) + " " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         }
+    }
+
+    private void uploadCameraImageToStorage() {
+
+        if (mBitmapCamera != null) {
+
+            //scaling the gallery image
+            customScaleImageCamera();
+
+            //convert my image to jpeg
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            mBitmapCamera.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            dataByteCamera = baos.toByteArray();
+
+            //for upload file (storage reference)
+            String path = mUsernameMail + "/" + UUID.randomUUID() + ".jpeg";
+            final StorageReference storageReference = mStorage.getReference(path);
+
+            //uploading
+            //dataByte = my image
+            UploadTask uploadTask = storageReference.putBytes(dataByteCamera);
+            uploadTask.addOnSuccessListener(ManageTripActivity.this,
+                    new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            //to get download url
+                            Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
+                            while (!urlTask.isSuccessful()) ;
+                            Uri url = urlTask.getResult();
+                            Logging.show(ManageTripActivity.this, "the url is: " + url);
+
+                            String ref = storageReference.getName();
+                            Logging.show(ManageTripActivity.this, "the ref is: " + ref);
+
+                            //clear image from memory (prevent OutOfMemoryError crash BUG)
+                            mBitmapCamera = null;
+                        }
+                    });
+        }
+
     }
 
     private void uploadGalleryImageToStorage() {
@@ -624,6 +680,48 @@ public class ManageTripActivity extends AppCompatActivity {
             }
 
             mBitmapGallery = Bitmap.createScaledBitmap(mBitmapGallery, myDstWidth, myDstHeight, true);
+
+            //verification
+            //Log.e("TAG:" , "AFTER scale - img width:" + bitmap.getWidth());
+            //Log.e("TAG:" , "AFTER scale - img height:" + bitmap.getHeight());
+        }
+    }
+
+    private void customScaleImageCamera() {
+
+        final double OPTIMUM_MAX_SIZE = 900.0;
+
+        if (mBitmapCamera != null) {
+            int myDstWidth = mBitmapCamera.getWidth();
+            int myDstHeight = mBitmapCamera.getHeight();
+            double temp;
+
+            //verification
+            //Log.e("TAG:" , "INITIAL img width:" + bitmap.getWidth());
+            //Log.e("TAG:" , "INITIAL img height:" + bitmap.getHeight());
+
+            int width = mBitmapCamera.getWidth();
+            int height = mBitmapCamera.getHeight();
+
+            if (height > width && height > OPTIMUM_MAX_SIZE) {
+                myDstHeight = (int) OPTIMUM_MAX_SIZE;
+
+                temp = height / OPTIMUM_MAX_SIZE;
+                double calc = width / temp;
+                width = (int) calc;
+                myDstWidth = width;
+
+            } else if (width > height && width > OPTIMUM_MAX_SIZE) {
+
+                myDstWidth = (int) OPTIMUM_MAX_SIZE;
+
+                temp = width / OPTIMUM_MAX_SIZE;
+                double calc = height / temp;
+                height = (int) calc;
+                myDstHeight = height;
+            }
+
+            mBitmapCamera = Bitmap.createScaledBitmap(mBitmapCamera, myDstWidth, myDstHeight, true);
 
             //verification
             //Log.e("TAG:" , "AFTER scale - img width:" + bitmap.getWidth());
