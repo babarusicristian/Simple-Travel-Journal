@@ -7,12 +7,12 @@
 
     <item
         android:state_pressed="true"
-        android:color="#132327" />
+        android:color="#FFFFFF" />
 
 
     <item
         android:state_pressed="false"
-        android:color="#274a51" />
+        android:color="#FFFFFF" />
 
 
 </selector>

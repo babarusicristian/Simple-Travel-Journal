@@ -13,11 +13,11 @@
     <string name="mountains">Mountains</string>
     <string name="your_trip_name_here">your trip name here</string>
     <string name="your_destination_here">your destination here</string>
-    <string name="price_euro">Price (euro)</string>
+    <string name="price_euro">Price (euro):</string>
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="dd_mm_yyyy">DD/MM/YYYY</string>
-    <string name="rate_this_trip">Rate this trip</string>
+    <string name="rate_the_trip">Rate the trip</string>
     <string name="save">Save</string>
     <string name="gallery_photo">Gallery Photo</string>
     <string name="take_picture">Take Picture</string>
@@ -45,5 +45,18 @@
     <string name="forgot_password">Forgot password?</string>
     <string name="demo_copyright_version">Demo copyright version</string>
     <string name="version">DNAS Software \u00AE version</string>
+    <string name="how_to_use_app">How to use app</string>
+    <string name="no_photo_taken">No photo taken</string>
+    <string name="no_image_file_selected">No image file selected</string>
+    <string name="remove">Remove</string>
+    <string name="image_file_selected">Image file selected</string>
+    <string name="image_file_removed">Image file removed</string>
+    <string name="photo_taken">Photo taken</string>
+    <string name="demo_1000">demo 1000</string>
+    <string name="set_price"><u>Set price</u></string>
+    <string name="set">Set</string>
+    <string name="cancel">Cancel</string>
+    <string name="max_value">Max value</string>
+    <string name="enter_the_trip_price_euro">Set the trip price</string>
 
 </resources>

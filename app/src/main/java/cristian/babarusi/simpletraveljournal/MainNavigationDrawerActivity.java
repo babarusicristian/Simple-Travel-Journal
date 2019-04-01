@@ -29,7 +29,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import cristian.babarusi.simpletraveljournal.fragments.TravelListFragment;
 import cristian.babarusi.simpletraveljournal.utils.Logging;
-import cristian.babarusi.simpletraveljournal.utils.Screen;
 
 public class MainNavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
@@ -64,6 +63,8 @@ public class MainNavigationDrawerActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_home); //home be checked by default
+
         //menu item from navigation drawer
         menu = navigationView.getMenu();
 
@@ -138,10 +139,11 @@ public class MainNavigationDrawerActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             TravelListFragment travelListFragment = new TravelListFragment();
             addFragment(travelListFragment);
-            Screen.hideNavigationBar(this);
         } else if (id == R.id.nav_favourite) {
 
         } else if (id == R.id.nav_about_us) {
+
+        } else if (id == R.id.nav_how_to_use_app) {
 
         } else if (id == R.id.nav_contact) {
 
@@ -203,21 +205,6 @@ public class MainNavigationDrawerActivity extends AppCompatActivity
                          this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API)
                 .build();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Screen.hideNavigationBar(this);
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
     }
 
     @Override

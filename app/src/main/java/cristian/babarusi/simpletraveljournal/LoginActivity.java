@@ -31,7 +31,6 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.text.MessageFormat;
 
 import cristian.babarusi.simpletraveljournal.utils.Logging;
-import cristian.babarusi.simpletraveljournal.utils.Screen;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -62,7 +61,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         initView();
         displayVersion();
-        Screen.hideNavigationBar(this);
 
         mButtonCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,12 +177,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
         mProgressBar.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Screen.hideNavigationBar(this);
     }
 
     private void skipIfAlreadyLogged() {

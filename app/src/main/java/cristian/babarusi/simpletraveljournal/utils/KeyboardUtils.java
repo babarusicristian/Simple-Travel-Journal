@@ -14,7 +14,6 @@ public abstract class KeyboardUtils extends AppCompatActivity {
         InputMethodManager imm =
                 (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        Screen.hideNavigationBar(activity);
     }
 
     public void showKeyboard(Activity activity, EditText editText) {

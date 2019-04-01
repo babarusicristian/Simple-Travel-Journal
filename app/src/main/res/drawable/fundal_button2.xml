@@ -11,6 +11,14 @@
     </item>
 
 
+    <!-- when is disabled -->
+    <item android:state_enabled="false" >
+        <shape android:shape="rectangle"  >
+            <corners android:radius="8dip" />
+            <stroke android:width="0dip" android:color="#132327" />
+            <gradient android:angle="-90" android:startColor="#c5c5c5" android:endColor="#c5c5c5"  />
+        </shape>
+    </item>
 
     <!-- natural state -->
     <item >

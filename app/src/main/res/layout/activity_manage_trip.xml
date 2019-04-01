@@ -1,376 +1,445 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/my_view"
-        android:background="@drawable/fundal4d"
-        android:layout_width="match_parent"
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        tools:context=".ManageTripActivity">
+        android:layout_centerInParent="true"
+        android:elevation="@dimen/space_8"
+        android:visibility="invisible"
+        tools:visibility="visible" />
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/my_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/trip_name"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="@drawable/fundal4d"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            tools:context=".ManageTripActivity">
 
-        <EditText
-            android:textColor="@drawable/text_color_click"
-            android:id="@+id/edit_text_trip_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:drawableStart="@drawable/ic_trip_name"
-            android:drawablePadding="@dimen/space_8"
-            android:ems="10"
-            android:hint="@string/your_trip_name_here"
-            android:inputType="textPersonName|textCapSentences"
-            android:textSize="@dimen/font_16"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/destination"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_text_trip_name" />
-
-        <EditText
-            android:textColor="@drawable/text_color_click"
-            android:id="@+id/edit_text_destination"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:drawableStart="@drawable/ic_destination"
-            android:drawablePadding="@dimen/space_8"
-            android:ems="10"
-            android:hint="@string/your_destination_here"
-            android:inputType="textPersonName|textCapSentences"
-            android:textSize="@dimen/font_16"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/trip_type"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_text_destination" />
-
-        <RadioGroup
-            android:id="@+id/radio_group_trip_type"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4">
-
-            <RadioButton
-                android:id="@+id/radio_button_city_break"
+            <TextView
+                android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/city_break"
-                android:textColor="@drawable/text_color_click"
-                android:textStyle="bold" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/texts_background_color"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/trip_name"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <RadioButton
-                android:id="@+id/radio_button_sea_side"
+            <EditText
+                android:id="@+id/edit_text_trip_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:drawableStart="@drawable/ic_trip_name"
+                android:drawablePadding="@dimen/space_8"
+                android:ems="10"
+                android:hint="@string/your_trip_name_here"
+                android:inputType="textPersonName|textCapSentences"
+                android:textColor="@drawable/text_color_click"
+                android:textSize="@dimen/font_16"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+            <TextView
+                android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/sea_side"
-                android:textColor="@drawable/text_color_click"
-                android:textStyle="bold" />
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#99ccdde1"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/destination"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_text_trip_name" />
 
-            <RadioButton
-                android:id="@+id/radio_button_mountains"
+            <EditText
+                android:id="@+id/edit_text_destination"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:drawableStart="@drawable/ic_destination"
+                android:drawablePadding="@dimen/space_8"
+                android:ems="10"
+                android:hint="@string/your_destination_here"
+                android:inputType="textPersonName|textCapSentences"
+                android:textColor="@drawable/text_color_click"
+                android:textSize="@dimen/font_16"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+            <TextView
+                android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/mountains"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#99ccdde1"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/trip_type"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_text_destination" />
+
+            <RadioGroup
+                android:id="@+id/radio_group_trip_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+                <RadioButton
+                    android:id="@+id/radio_button_city_break"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/city_break"
+                    android:textColor="@drawable/text_color_click"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radio_button_sea_side"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/sea_side"
+                    android:textColor="@drawable/text_color_click"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/radio_button_mountains"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/mountains"
+                    android:textColor="@drawable/text_color_click"
+                    android:textStyle="bold" />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="#99ccdde1"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/price_euro"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/radio_group_trip_type" />
+
+            <SeekBar
+                android:id="@+id/seek_bar_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:max="2000"
+                android:progress="0"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/text_background"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/start_date"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView7"
+                app:layout_constraintEnd_toEndOf="@+id/button_start_date"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/button_start_date" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="#99ccdde1"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/end_date"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/button_end_date"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/button_end_date"
+                app:layout_constraintTop_toBottomOf="@+id/seek_bar_price" />
+
+            <Button
+                android:id="@+id/button_start_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/fundal_button2"
+                android:fontFamily="sans-serif"
+                android:gravity="start|center"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
+                android:text="@string/dd_mm_yyyy"
+                android:textColor="@drawable/text_color_click2"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@+id/button_end_date"
+                app:layout_constraintEnd_toStartOf="@+id/button_end_date"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Button
+                android:id="@+id/button_end_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/fundal_button2"
+                android:fontFamily="sans-serif"
+                android:gravity="start|center"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
+                android:text="@string/dd_mm_yyyy"
+                android:textColor="@drawable/text_color_click2"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/button_start_date"
+                app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#99ccdde1"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/rate_the_trip"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_start_date" />
+
+            <RatingBar
+                android:id="@+id/rating_bar_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:numStars="5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+            <Button
+                android:id="@+id/button_save"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/fundal_button3"
+                android:text="@string/save"
+                android:textColor="@drawable/text_color_click3"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_select_take_picture"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:background="#99ccdde1"
+                android:gravity="center"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/gallery_photo"
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView10"
+                app:layout_constraintEnd_toStartOf="@+id/textView10"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#99ccdde1"
+                android:gravity="center"
+                android:paddingStart="@dimen/space_8"
+                android:paddingTop="@dimen/space_2"
+                android:paddingEnd="@dimen/space_8"
+                android:paddingBottom="@dimen/space_2"
+                android:text="@string/take_picture"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/textView9"
+                app:layout_constraintTop_toBottomOf="@+id/rating_bar_rating" />
+
+            <Button
+                android:id="@+id/button_select_gallery_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/fundal_button2"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
+                android:text="@string/select"
+                android:textColor="@drawable/text_color_click2"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/textView9"
+                app:layout_constraintHorizontal_bias="0.468"
+                app:layout_constraintStart_toStartOf="@+id/textView9"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_status_gallery" />
+
+            <Button
+                android:id="@+id/button_select_take_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/fundal_button2"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
+                android:text="@string/select"
+                android:textColor="@drawable/text_color_click2"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/textView10"
+                app:layout_constraintStart_toStartOf="@+id/textView10"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_status_camera" />
+
+            <TextView
+                android:id="@+id/text_view_status_gallery"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/no_image_file_selected"
+                android:textColor="@color/dark_red"
+                android:textSize="@dimen/font_12"
+                app:layout_constraintEnd_toEndOf="@+id/textView9"
+                app:layout_constraintStart_toStartOf="@+id/textView9"
+                app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+            <TextView
+                android:id="@+id/text_view_status_camera"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/no_photo_taken"
+                android:textColor="@color/dark_red"
+                android:textSize="@dimen/font_12"
+                app:layout_constraintEnd_toEndOf="@+id/textView10"
+                app:layout_constraintStart_toStartOf="@+id/textView10"
+                app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
+            <TextView
+                android:id="@+id/text_view_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/demo_1000"
+                app:layout_constraintBaseline_toBaselineOf="@+id/textView5"
+                app:layout_constraintStart_toEndOf="@+id/textView5" />
+
+            <TextView
+                android:background="@drawable/only_border"
+                android:id="@+id/text_view_set_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="@dimen/space_8"
+                android:text="@string/set_price"
                 android:textColor="@drawable/text_color_click"
-                android:textStyle="bold" />
-        </RadioGroup>
+                android:textStyle="bold"
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_view_price"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/price_euro"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radio_group_trip_type" />
+        </android.support.constraint.ConstraintLayout>
 
-        <SeekBar
-            android:id="@+id/seek_bar_price_euro"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:max="100"
-            android:progress="34"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" />
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/text_background"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/start_date"
-            android:textStyle="bold"
-            app:layout_constraintBaseline_toBaselineOf="@+id/textView7"
-            app:layout_constraintEnd_toEndOf="@+id/button_start_date"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/button_start_date" />
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/end_date"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/button_end_date"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/button_end_date"
-            app:layout_constraintTop_toBottomOf="@+id/seek_bar_price_euro" />
-
-        <Button
-            android:textColor="@drawable/text_color_click2"
-            android:id="@+id/button_start_date"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/fundal_button2"
-            android:fontFamily="sans-serif"
-            android:gravity="start|center"
-            android:paddingStart="@dimen/space_8"
-            android:paddingEnd="@dimen/space_8"
-            android:text="@string/dd_mm_yyyy"
-            android:textStyle="bold"
-            app:layout_constraintBaseline_toBaselineOf="@+id/button_end_date"
-            app:layout_constraintEnd_toStartOf="@+id/button_end_date"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
-            android:textColor="@drawable/text_color_click2"
-            android:id="@+id/button_end_date"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/fundal_button2"
-            android:fontFamily="sans-serif"
-            android:gravity="start|center"
-            android:paddingStart="@dimen/space_8"
-            android:paddingEnd="@dimen/space_8"
-            android:text="@string/dd_mm_yyyy"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/button_start_date"
-            app:layout_constraintTop_toBottomOf="@+id/textView7" />
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/rate_this_trip"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_start_date" />
-
-        <RatingBar
-            android:id="@+id/rating_bar_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:numStars="5"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8" />
-
-        <Button
-            android:id="@+id/button_save"
-            style="@style/Widget.AppCompat.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/fundal_button3"
-            android:text="@string/save"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_select_take_picture" />
-
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/gallery_photo"
-            android:textStyle="bold"
-            app:layout_constraintBaseline_toBaselineOf="@+id/textView10"
-            app:layout_constraintEnd_toStartOf="@+id/textView10"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="#99ccdde1"
-            android:paddingStart="@dimen/space_8"
-            android:paddingTop="@dimen/space_2"
-            android:paddingEnd="@dimen/space_8"
-            android:paddingBottom="@dimen/space_2"
-            android:text="@string/take_picture"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/textView9"
-            app:layout_constraintTop_toBottomOf="@+id/rating_bar_rating" />
-
-        <Button
-            android:textStyle="bold"
-            android:textColor="@drawable/text_color_click2"
-            android:id="@+id/button_select_gallery_photo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/fundal_button2"
-            android:paddingStart="@dimen/space_8"
-            android:paddingEnd="@dimen/space_8"
-            android:text="@string/select"
-            app:layout_constraintEnd_toEndOf="@+id/textView9"
-            app:layout_constraintStart_toStartOf="@+id/textView9"
-            app:layout_constraintTop_toBottomOf="@+id/textView9" />
-
-        <Button
-            android:textStyle="bold"
-            android:textColor="@drawable/text_color_click2"
-            android:id="@+id/button_select_take_picture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/fundal_button2"
-            android:paddingStart="@dimen/space_8"
-            android:paddingEnd="@dimen/space_8"
-            android:text="@string/select"
-            app:layout_constraintEnd_toEndOf="@+id/textView10"
-            app:layout_constraintStart_toStartOf="@+id/textView10"
-            app:layout_constraintTop_toBottomOf="@+id/textView10" />
-
-    </android.support.constraint.ConstraintLayout>
-
-</ScrollView>
+    </ScrollView>
 
 
+</RelativeLayout>
 
