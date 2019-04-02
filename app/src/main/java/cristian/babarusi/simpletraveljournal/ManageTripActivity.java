@@ -32,7 +32,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -52,6 +51,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.UUID;
 import cristian.babarusi.simpletraveljournal.recyclerViewSources.DestinationsAdapter;
 import cristian.babarusi.simpletraveljournal.utils.KeyboardUtils;
@@ -91,6 +91,7 @@ public class ManageTripActivity extends AppCompatActivity {
     //for custom the date
     private int mYearStart, mMonthStart, mDayStart;
     private int mYearEnd, mMonthEnd, mDayEnd;
+    private long mStartDateMiliseconds;
 
     private static final String MONTH_JAN = "Jan";
     private static final String MONTH_FEB = "Feb";
@@ -116,13 +117,15 @@ public class ManageTripActivity extends AppCompatActivity {
     //for firestore (cloud database)
     FirebaseFirestore db;
 
-    //for firebase use
-    private static final String ANONYMOUS = "anonymus :D";
+    //for store datas (rest fields retrive value directly)
+    private float mRating;
+    private String mUrlDownloadLink;
+    private String mFileReference;
 
-    //for store datas
-    private String mTripName;
-    private String mDestination;
-    private double mRating;
+    Map<String, Object> mUserDatas;
+
+    private Timer mTimerChecking;
+    private boolean mFlagOK = false;
 
     //for use on DB read and write
     private static final String DB_TRIP_NAME = "db_tripName";
@@ -135,7 +138,7 @@ public class ManageTripActivity extends AppCompatActivity {
     private static final String DB_URL_IMAGE = "db_urlImage";
     private static final String DB_FAVORITE = "db_favorite";
     private static final String DB_START_DATE_MILISEC = "db_startDateMilisec";
-    private static final String DB_FILE_REFERECNE = "db_fileReference";
+    private static final String DB_FILE_REFERENCE = "db_fileReference";
     private static final String DB_REF_IDENTITY = "db_refIdentity";
 
     private static final String CITY_BREAK = "cityBreak";
@@ -157,6 +160,9 @@ public class ManageTripActivity extends AppCompatActivity {
 
         //initialize firebase storage
         mStorage = FirebaseStorage.getInstance();
+
+        //initialize firestore DB
+        db = FirebaseFirestore.getInstance();
 
 
         //receiving data from recycler view (trip list)
@@ -266,6 +272,23 @@ public class ManageTripActivity extends AppCompatActivity {
 
                                 //do not format (it causes BUG)
                                 mButtonStartDate.setText(textDay + "/" + textMonth + "/" + year);
+
+                                //retrive miliseconds value
+                                String myDate = dayOfMonth + "/" + monthOfYear + "/" + year;
+
+                                Logging.show(ManageTripActivity.this, "data de salvare: " + myDate);
+
+                                SimpleDateFormat sdf = new SimpleDateFormat("d/m/yyyy");
+                                Date date = null;
+                                try {
+                                    date = sdf.parse(myDate);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    Logging.show(ManageTripActivity.this, "Error retrive milisec date: " + e.getMessage());
+                                }
+                                mStartDateMiliseconds = date.getTime();
+                                Logging.show(ManageTripActivity.this, "mStartDateMiliseconds: " + mStartDateMiliseconds);
+
                             }
                         }, mYearStart, mMonthStart, mDayStart);
                 datePickerDialog.show();
@@ -339,6 +362,7 @@ public class ManageTripActivity extends AppCompatActivity {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 loseEditTextsFocus();
+                mRating = mRatingBarRating.getRating();
             }
         });
 
@@ -433,7 +457,6 @@ public class ManageTripActivity extends AppCompatActivity {
                 String price = mTextViewPrice.getText().toString().trim();
                 String startDate = mButtonStartDate.getText().toString().toUpperCase();
                 String endDate = mButtonEndDate.getText().toString().toUpperCase();
-                double rating = mRatingBarRating.getRating();
 
                 //for trip name
                 if (tripName.isEmpty()) {
@@ -468,14 +491,12 @@ public class ManageTripActivity extends AppCompatActivity {
                     Snack.bar(v, "End date is missing");
                     return;
                 }
-                //for rating
-                if(rating == 0) {
-                    Snack.bar(v, "Rating is missing");
-                }
 
 
                 //PORNESTE-LE
-                //blockAllActivityProgressBar();
+                blockAllActivityProgressBar();
+
+                saveToFirestore();
 //
 //                uploadGalleryImageToStorage();
 //                uploadCameraImageToStorage();
@@ -512,6 +533,28 @@ public class ManageTripActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void initView() {
+        mConstraintLayoutMyView = findViewById(R.id.my_view);
+        mRadioButtonCityBreak = findViewById(R.id.radio_button_city_break);
+        mRadioButtonSeaSide = findViewById(R.id.radio_button_sea_side);
+        mRadioButtonMountains = findViewById(R.id.radio_button_mountains);
+        mSeekBarPrice = findViewById(R.id.seek_bar_price);
+        mButtonStartDate = findViewById(R.id.button_start_date);
+        mButtonEndDate = findViewById(R.id.button_end_date);
+        mRatingBarRating = findViewById(R.id.rating_bar_rating);
+        mButtonSelectGalleryPhoto = findViewById(R.id.button_select_gallery_photo);
+        mButtonSelectTakePicture = findViewById(R.id.button_select_take_picture);
+        mButtonSave = findViewById(R.id.button_save);
+        mEditTextTripName = findViewById(R.id.edit_text_trip_name);
+        mEditTextDestination = findViewById(R.id.edit_text_destination);
+        mProgressBar = findViewById(R.id.progressBar);
+        mTextViewPrice = findViewById(R.id.text_view_price);
+        mTextViewPrice.setText(String.valueOf(mSeekBarPrice.getProgress()));
+        mTextViewSetPrice = findViewById(R.id.text_view_set_price);
+        mTextViewStatusGallery = findViewById(R.id.text_view_status_gallery);
+        mTextViewStatusCamera = findViewById(R.id.text_view_status_camera);
     }
 
     private void mentainDateStartSelection() {
@@ -626,58 +669,18 @@ public class ManageTripActivity extends AppCompatActivity {
         }
     }
 
-    private void initView() {
-        mConstraintLayoutMyView = findViewById(R.id.my_view);
-        mRadioButtonCityBreak = findViewById(R.id.radio_button_city_break);
-        mRadioButtonSeaSide = findViewById(R.id.radio_button_sea_side);
-        mRadioButtonMountains = findViewById(R.id.radio_button_mountains);
-        mSeekBarPrice = findViewById(R.id.seek_bar_price);
-        mButtonStartDate = findViewById(R.id.button_start_date);
-        mButtonEndDate = findViewById(R.id.button_end_date);
-        mRatingBarRating = findViewById(R.id.rating_bar_rating);
-        mButtonSelectGalleryPhoto = findViewById(R.id.button_select_gallery_photo);
-        mButtonSelectTakePicture = findViewById(R.id.button_select_take_picture);
-        mButtonSave = findViewById(R.id.button_save);
-        mEditTextTripName = findViewById(R.id.edit_text_trip_name);
-        mEditTextDestination = findViewById(R.id.edit_text_destination);
-        mProgressBar = findViewById(R.id.progressBar);
-        mTextViewPrice = findViewById(R.id.text_view_price);
-        mTextViewPrice.setText(String.valueOf(mSeekBarPrice.getProgress()));
-        mTextViewSetPrice = findViewById(R.id.text_view_set_price);
-        mTextViewStatusGallery = findViewById(R.id.text_view_status_gallery);
-        mTextViewStatusCamera = findViewById(R.id.text_view_status_camera);
-    }
-
-    private void saveToFirestore() {
-
-        //my DB object creation
-        Map<String, Object> userDatas = new HashMap<>();
-        userDatas.put(DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
-        userDatas.put(DB_DESTINATION, mEditTextDestination.getText().toString().trim()); //String
-        if (mRadioButtonCityBreak.isChecked()) {
-            userDatas.put(DB_TRIP_TYPE, CITY_BREAK); //String
-        }
-        else if (mRadioButtonSeaSide.isChecked()) {
-            userDatas.put(DB_TRIP_TYPE, SEA_SIDE); //String
-        }
-        else if (mRadioButtonMountains.isChecked()) {
-            userDatas.put(DB_TRIP_TYPE, MOUNTAINS); //String
-        }
-        userDatas.put(DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
-        userDatas.put(DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
-        userDatas.put(DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
-        //TODO de continuat objectul
-
-
-
+    private void addToDatabase() {
         //firestore saving...
         db.collection(mUsernameMail)
-                .add(userDatas)
+                .add(mUserDatas)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(ManageTripActivity.this, "Datas added succesfully", Toast.LENGTH_SHORT).show();
-                        //here to do the final mark...activate FINISH on timer //or maybe NOT
+                        Toast.makeText(ManageTripActivity.this, "Trip stored successfully", Toast.LENGTH_SHORT).show();
+
+                        Logging.show(ManageTripActivity.this, "uploaded DB");
+                        finish(); //close activity
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -686,6 +689,77 @@ public class ManageTripActivity extends AppCompatActivity {
                         Toast.makeText(ManageTripActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void saveToFirestore() {
+        //initialize object
+        mUserDatas = new HashMap<>();
+
+        if (mBitmapGallery == null && mBitmapCamera == null)
+        {
+            //dont upload any images
+            mUserDatas.put(DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
+            mUserDatas.put(DB_DESTINATION, mEditTextDestination.getText().toString().trim()); //String
+            if (mRadioButtonCityBreak.isChecked()) {
+                mUserDatas.put(DB_TRIP_TYPE, CITY_BREAK); //String
+            } else if (mRadioButtonSeaSide.isChecked()) {
+                mUserDatas.put(DB_TRIP_TYPE, SEA_SIDE); //String
+            } else if (mRadioButtonMountains.isChecked()) {
+                mUserDatas.put(DB_TRIP_TYPE, MOUNTAINS); //String
+            }
+            mUserDatas.put(DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
+            mUserDatas.put(DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
+            mUserDatas.put(DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
+            mUserDatas.put(DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
+            mUserDatas.put(DB_RATING, mRating); //number (double)
+            if (mBitmapGallery != null) {
+                mUserDatas.put(DB_REF_IDENTITY, "GALLERY"); //String
+                //clear image from memory (prevent OutOfMemoryError crash BUG)
+                mBitmapGallery = null; //moved after is saved in DB
+            } else if (mBitmapCamera != null) {
+                mUserDatas.put(DB_REF_IDENTITY, "CAMERA"); //String
+                //clear image from memory (prevent OutOfMemoryError crash BUG)
+                mBitmapCamera = null;
+            } else {
+                mUserDatas.put(DB_REF_IDENTITY, "NONE");
+            }
+            mUserDatas.put(DB_FAVORITE, false); //boolean
+            mUserDatas.put(DB_URL_IMAGE, null);
+            mUserDatas.put(DB_FILE_REFERENCE, null);
+
+            addToDatabase();
+        } else {
+            uploadCameraImageToStorage();
+            uploadGalleryImageToStorage();
+
+            mUserDatas.put(DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
+            mUserDatas.put(DB_DESTINATION, mEditTextDestination.getText().toString().trim());
+            //String
+            if (mRadioButtonCityBreak.isChecked()) {
+                mUserDatas.put(DB_TRIP_TYPE, CITY_BREAK); //String
+            } else if (mRadioButtonSeaSide.isChecked()) {
+                mUserDatas.put(DB_TRIP_TYPE, SEA_SIDE); //String
+            } else if (mRadioButtonMountains.isChecked()) {
+                mUserDatas.put(DB_TRIP_TYPE, MOUNTAINS); //String
+            }
+            mUserDatas.put(DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
+            mUserDatas.put(DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
+            mUserDatas.put(DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
+            mUserDatas.put(DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
+            mUserDatas.put(DB_RATING, mRating); //number (double)
+            if (mBitmapGallery != null) {
+                mUserDatas.put(DB_REF_IDENTITY, "GALLERY"); //String
+                //clear image from memory (prevent OutOfMemoryError crash BUG)
+                mBitmapGallery = null; //moved after is saved in DB
+            } else if (mBitmapCamera != null) {
+                mUserDatas.put(DB_REF_IDENTITY, "CAMERA"); //String
+                //clear image from memory (prevent OutOfMemoryError crash BUG)
+                mBitmapCamera = null;
+            } else {
+                mUserDatas.put(DB_REF_IDENTITY, "NONE");
+            }
+            mUserDatas.put(DB_FAVORITE, false); //boolean
+        }
     }
 
     private File createImageFile() throws IOException {
@@ -939,26 +1013,30 @@ public class ManageTripActivity extends AppCompatActivity {
             //uploading
             //dataByte = my image
             UploadTask uploadTask = storageReference.putBytes(dataByteCamera);
-            uploadTask.addOnSuccessListener(ManageTripActivity.this,
-                    new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Task<Uri> firebaseUri = taskSnapshot.getStorage().getDownloadUrl();
+                    firebaseUri.addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        public void onSuccess(Uri uri) {
 
-                            //to get download url
-                            Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
-                            while (!urlTask.isSuccessful()) ;
-                            Uri url = urlTask.getResult();
+                            mUserDatas.put(DB_URL_IMAGE, uri.toString());
+                            mUserDatas.put(DB_FILE_REFERENCE, storageReference.getName());
+
+                            String url = uri.toString();
                             Logging.show(ManageTripActivity.this, "the url is: " + url);
 
                             String ref = storageReference.getName();
                             Logging.show(ManageTripActivity.this, "the ref is: " + ref);
 
-                            //clear image from memory (prevent OutOfMemoryError crash BUG)
-                            mBitmapCamera = null;
+                            //call updateDB CAMERA
+                            addToDatabase();
                         }
                     });
+                }
+            });
         }
-
     }
 
     private void uploadGalleryImageToStorage() {
@@ -980,22 +1058,27 @@ public class ManageTripActivity extends AppCompatActivity {
             //uploading
             //dataByte = my image
             UploadTask uploadTask = storageReference.putBytes(dataByteGallery);
-            uploadTask.addOnSuccessListener(ManageTripActivity.this,
-                    new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Task<Uri> firebaseUri = taskSnapshot.getStorage().getDownloadUrl();
+                    firebaseUri.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
 
-                    //to get download url
-                    Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
-                    while (!urlTask.isSuccessful()) ;
-                    Uri url = urlTask.getResult();
-                    Logging.show(ManageTripActivity.this, "the url is: " + url);
+                            mUserDatas.put(DB_URL_IMAGE, uri.toString());
+                            mUserDatas.put(DB_FILE_REFERENCE, storageReference.getName());
 
-                    String ref = storageReference.getName();
-                    Logging.show(ManageTripActivity.this, "the ref is: " + ref);
+                            String url = uri.toString();
+                            Logging.show(ManageTripActivity.this, "the url is: " + url);
 
-                    //clear image from memory (prevent OutOfMemoryError crash BUG)
-                    mBitmapGallery = null;
+                            String ref = storageReference.getName();
+                            Logging.show(ManageTripActivity.this, "the ref is: " + ref);
+
+                            //call updateDB GALLERY
+                            addToDatabase();
+                        }
+                    });
                 }
             });
         }
