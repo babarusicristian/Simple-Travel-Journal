@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -23,7 +24,9 @@ public class DestinationsAdapter extends RecyclerView.Adapter<DestinationsViewHo
     private Context mContext;
     private List<Destinations> mListDestinations;
 
-    private ImageView imageViewDestinations;
+    private ImageView mImageViewDestinations;
+    private TextView mTextViewEdit;
+    private TextView mTextViewDelete;
 
     //constructor custom
     public DestinationsAdapter(Context context, List<Destinations> list) {
@@ -40,7 +43,9 @@ public class DestinationsAdapter extends RecyclerView.Adapter<DestinationsViewHo
                         viewGroup, false);
 
         //initViews
-        imageViewDestinations = itemView.findViewById(R.id.image_view_travel_list_picture);
+        mImageViewDestinations = itemView.findViewById(R.id.image_view_travel_list_picture);
+        mTextViewEdit = itemView.findViewById(R.id.text_view_travel_list_edit);
+        mTextViewDelete = itemView.findViewById(R.id.text_view_travel_list_delete);
 
         return new DestinationsViewHolder(itemView);
     }
@@ -61,15 +66,8 @@ public class DestinationsAdapter extends RecyclerView.Adapter<DestinationsViewHo
         final String itemSubtitle = mListDestinations.get(i).getDestinationSubtitle();
 
         //TODO temporary clicks procedures
-        //on image click
-        imageViewDestinations.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "Clicked image at pos: " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
 
-        //item list click
+        //item list CLICK
         destinationsViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,7 +75,7 @@ public class DestinationsAdapter extends RecyclerView.Adapter<DestinationsViewHo
             }
         });
 
-        //item list long click
+        //item list long CLICK
         destinationsViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -86,6 +84,30 @@ public class DestinationsAdapter extends RecyclerView.Adapter<DestinationsViewHo
                 intentManageTrip.putExtra(KEY_SUBTITLE, itemSubtitle);
                 mContext.startActivity(intentManageTrip);
                 return true;
+            }
+        });
+
+        //on image click
+        mImageViewDestinations.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Clicked image at pos: " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //on edit CLICK
+        mTextViewEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Clicked Edit at pos: " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //on edit CLICK
+        mTextViewDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Clicked Delete at pos: " + position, Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -5,6 +5,9 @@ public class Destinations {
     private String mTripNameTitle;
     private String mDestinationSubtitle;
     private int mPicture;
+    private double mRating;
+
+    //TODO complete rest of datas fields from DB (rating, favorite boolean, id, reference... etc
 
     public String getTripNameTitle() {
         return mTripNameTitle;
@@ -28,5 +31,13 @@ public class Destinations {
 
     public void setPicture(int picture) {
         mPicture = picture;
+    }
+
+    public double getRating() {
+        return mRating;
+    }
+
+    public void setRating(double rating) {
+        mRating = rating;
     }
 }

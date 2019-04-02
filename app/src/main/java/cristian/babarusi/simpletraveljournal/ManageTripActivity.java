@@ -6,16 +6,20 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -27,27 +31,39 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import cristian.babarusi.simpletraveljournal.recyclerViewSources.DestinationsAdapter;
 import cristian.babarusi.simpletraveljournal.utils.KeyboardUtils;
 import cristian.babarusi.simpletraveljournal.utils.Logging;
+import cristian.babarusi.simpletraveljournal.utils.Snack;
 
 public class ManageTripActivity extends AppCompatActivity {
 
     public static final int GALLERY_CODE = 101;
     private static final int CAMERA_CODE = 202;
+    private static final int REQUEST_TAKE_PHOTO = 1;
+    private String mCurrentPhotoPath;
     byte[] dataByteGallery;
     byte[] dataByteCamera;
     private Bitmap mBitmapGallery;
@@ -76,6 +92,19 @@ public class ManageTripActivity extends AppCompatActivity {
     private int mYearStart, mMonthStart, mDayStart;
     private int mYearEnd, mMonthEnd, mDayEnd;
 
+    private static final String MONTH_JAN = "Jan";
+    private static final String MONTH_FEB = "Feb";
+    private static final String MONTH_MAR = "Mar";
+    private static final String MONTH_APR = "Apr";
+    private static final String MONTH_MAY = "May";
+    private static final String MONTH_JUN = "Jun";
+    private static final String MONTH_JUL = "Jul";
+    private static final String MONTH_AUG = "Aug";
+    private static final String MONTH_SEP = "Sep";
+    private static final String MONTH_OCT = "Oct";
+    private static final String MONTH_NOV = "Nov";
+    private static final String MONTH_DEC = "Dec";
+
     //firebase storage
     private FirebaseStorage mStorage;
 
@@ -83,6 +112,35 @@ public class ManageTripActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private String mUsernameMail;
+
+    //for firestore (cloud database)
+    FirebaseFirestore db;
+
+    //for firebase use
+    private static final String ANONYMOUS = "anonymus :D";
+
+    //for store datas
+    private String mTripName;
+    private String mDestination;
+    private double mRating;
+
+    //for use on DB read and write
+    private static final String DB_TRIP_NAME = "db_tripName";
+    private static final String DB_DESTINATION = "db_destination";
+    private static final String DB_TRIP_TYPE = "db_tripType";
+    private static final String DB_PRICE_EURO = "db_priceEuro";
+    private static final String DB_START_DATE = "db_startDate";
+    private static final String DB_END_DATE = "db_endDate";
+    private static final String DB_RATING = "db_rating";
+    private static final String DB_URL_IMAGE = "db_urlImage";
+    private static final String DB_FAVORITE = "db_favorite";
+    private static final String DB_START_DATE_MILISEC = "db_startDateMilisec";
+    private static final String DB_FILE_REFERECNE = "db_fileReference";
+    private static final String DB_REF_IDENTITY = "db_refIdentity";
+
+    private static final String CITY_BREAK = "cityBreak";
+    private static final String SEA_SIDE = "seaSide";
+    private static final String MOUNTAINS = "mountains";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +190,7 @@ public class ManageTripActivity extends AppCompatActivity {
         mTextViewSetPrice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loseEditTextsFocus();
                 dialogSetPrice();
             }
         });
@@ -164,6 +223,9 @@ public class ManageTripActivity extends AppCompatActivity {
                 mMonthStart = c.get(Calendar.MONTH);
                 mDayStart = c.get(Calendar.DAY_OF_MONTH);
 
+                //to mentain current selection
+                mentainDateStartSelection();
+
                 DatePickerDialog datePickerDialog = new DatePickerDialog(ManageTripActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -181,16 +243,25 @@ public class ManageTripActivity extends AppCompatActivity {
                                 //for use words on months
                                 textMonth = getWordsOnMonth(monthOfYear, textMonth);
 
-                                //checking dates: start and end
+                                //checking dates: start
                                 mDayStart = dayOfMonth;
                                 mMonthStart = monthOfYear;
                                 mYearStart = year;
 
-                                if (mYearStart > mYearEnd && mYearEnd != 0
-                                || mMonthStart > mMonthEnd && mMonthEnd != 0
-                                || mDayStart > mDayEnd && mDayEnd != 0) {
+                                //date verification (START)
+                                if (mDayEnd != 0 && mMonthEnd != 0  && mYearEnd != 0) {
+                                    if (mYearStart > mYearEnd) {
                                         displayStartDateError();
                                         return;
+                                    }
+                                    if (mMonthStart > mMonthEnd && mYearStart == mYearEnd) {
+                                        displayStartDateError();
+                                        return;
+                                    }
+                                    if (mDayStart > mDayEnd && mMonthStart == mMonthEnd && mYearStart == mYearEnd) {
+                                        displayStartDateError();
+                                        return;
+                                    }
                                 }
 
                                 //do not format (it causes BUG)
@@ -212,6 +283,9 @@ public class ManageTripActivity extends AppCompatActivity {
                 mMonthEnd = c.get(Calendar.MONTH);
                 mDayEnd = c.get(Calendar.DAY_OF_MONTH);
 
+                //to mentain current selection
+                mentainDateEndSelection();
+
                 DatePickerDialog datePickerDialog = new DatePickerDialog(ManageTripActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
@@ -229,20 +303,32 @@ public class ManageTripActivity extends AppCompatActivity {
                                 //for use words on months
                                 textMonth = getWordsOnMonth(monthOfYear, textMonth);
 
-                                //checking dates: start and end
+                                //checking dates: end
                                 mDayEnd = dayOfMonth;
                                 mMonthEnd = monthOfYear;
                                 mYearEnd = year;
 
-                                if (mYearStart > mYearEnd && mYearEnd != 0
-                                || mMonthStart > mMonthEnd && mMonthEnd != 0
-                                || mDayStart > mDayEnd && mDayEnd != 0) {
-                                    displayEndDateError();
-                                    return;
+                                //date verification (END)
+                                if (mDayStart != 0 && mMonthStart != 0  && mYearStart != 0) {
+                                    if (mYearStart > mYearEnd) {
+                                        displayEndDateError();
+                                        return;
+                                    }
+                                    if (mMonthStart > mMonthEnd && mYearStart == mYearEnd) {
+                                        displayEndDateError();
+                                        return;
+                                    }
+                                    if (mDayStart > mDayEnd && mMonthStart == mMonthEnd && mYearStart == mYearEnd) {
+                                        displayEndDateError();
+                                        return;
+                                    }
                                 }
 
                                 //do not format (it causes BUG)
                                 mButtonEndDate.setText(textDay + "/" + textMonth + "/" + year);
+
+                                //date end to mDate2 - for compare
+                                SimpleDateFormat sdf = new SimpleDateFormat("d/m/yyyy");
                             }
                         }, mYearEnd, mMonthEnd, mDayEnd);
                 datePickerDialog.show();
@@ -307,10 +393,8 @@ public class ManageTripActivity extends AppCompatActivity {
                             Manifest.permission.CAMERA)
                             == PackageManager.PERMISSION_GRANTED) {
                         //open camera
-                        Intent intentTakePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        if (intentTakePicture.resolveActivity(getPackageManager()) != null) {
-                            startActivityForResult(intentTakePicture, CAMERA_CODE);
-                        }
+                        dispatchTakePictureIntent();
+
                     } else {
                         //open specific fragment to ask for permission
                         ActivityCompat.requestPermissions(ManageTripActivity.this,
@@ -342,11 +426,59 @@ public class ManageTripActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loseEditTextsFocus();
                 //TODO save button click
-                blockAllActivityProgressBar();
 
-                //temporar activate
-                uploadGalleryImageToStorage();
-                uploadCameraImageToStorage();
+                // verifyAllBeforeSave
+                String tripName = mEditTextTripName.getText().toString().trim();
+                String destination = mEditTextDestination.getText().toString().trim();
+                String price = mTextViewPrice.getText().toString().trim();
+                String startDate = mButtonStartDate.getText().toString().toUpperCase();
+                String endDate = mButtonEndDate.getText().toString().toUpperCase();
+                double rating = mRatingBarRating.getRating();
+
+                //for trip name
+                if (tripName.isEmpty()) {
+                    mEditTextTripName.requestFocus();
+                    mEditTextTripName.setError("Trip name is missing");
+                    return;
+                }
+                //for destination
+                if (destination.isEmpty()) {
+                    mEditTextDestination.requestFocus();
+                    mEditTextDestination.setError("Destination is missing");
+                    return;
+                }
+                //for radio buttons trip type
+                if (!mRadioButtonCityBreak.isChecked()
+                        && !mRadioButtonSeaSide.isChecked()
+                        && !mRadioButtonMountains.isChecked()) {
+                    Snack.bar(v, "Trip type is missing");
+                    return;
+                }
+                //for price
+                if (price.equals("0")) {
+                    Snack.bar(v, "Price is missing");
+                    return;
+                }
+                //for start and end date
+                if (startDate.equals("DD/MM/YYYY")) {
+                    Snack.bar(v, "Start date is missing");
+                    return;
+                }
+                if (endDate.equals("DD/MM/YYYY")) {
+                    Snack.bar(v, "End date is missing");
+                    return;
+                }
+                //for rating
+                if(rating == 0) {
+                    Snack.bar(v, "Rating is missing");
+                }
+
+
+                //PORNESTE-LE
+                //blockAllActivityProgressBar();
+//
+//                uploadGalleryImageToStorage();
+//                uploadCameraImageToStorage();
 
             }
         });
@@ -382,6 +514,118 @@ public class ManageTripActivity extends AppCompatActivity {
         });
     }
 
+    private void mentainDateStartSelection() {
+        if (!mButtonStartDate.getText().toString().equals("DD/MM/YYYY")){
+
+            String textButton = mButtonStartDate.getText().toString().trim();
+            String[] arrOfStr = textButton.split("/");
+
+            mYearStart = Integer.parseInt(arrOfStr[2]);
+            String tempVal = arrOfStr[1];
+            switch (tempVal) {
+                case MONTH_JAN :
+                    mMonthStart = 0;
+                    break;
+                case MONTH_FEB :
+                    mMonthStart = 1;
+                    break;
+                case MONTH_MAR :
+                    mMonthStart = 2;
+                    break;
+                case MONTH_APR :
+                    mMonthStart = 3;
+                    break;
+                case MONTH_MAY :
+                    mMonthStart = 4;
+                    break;
+                case MONTH_JUN :
+                    mMonthStart = 5;
+                    break;
+                case MONTH_JUL :
+                    mMonthStart = 6;
+                    break;
+                case MONTH_AUG :
+                    mMonthStart = 7;
+                    break;
+                case MONTH_SEP :
+                    mMonthStart = 8;
+                    break;
+                case MONTH_OCT :
+                    mMonthStart = 9;
+                    break;
+                case MONTH_NOV :
+                    mMonthStart = 10;
+                    break;
+                case MONTH_DEC :
+                    mMonthStart = 11;
+                    break;
+            }
+
+            String tempDay = arrOfStr[0];
+            if (tempDay.startsWith("0")) {
+                mDayStart = Integer.parseInt(tempDay.substring(1));
+            } else {
+                mDayStart = Integer.parseInt(arrOfStr[0]);
+            }
+        }
+    }
+
+    private void mentainDateEndSelection() {
+        if (!mButtonEndDate.getText().toString().equals("DD/MM/YYYY")){
+
+            String textButton = mButtonEndDate.getText().toString().trim();
+            String[] arrOfStr = textButton.split("/");
+
+            mYearEnd = Integer.parseInt(arrOfStr[2]);
+            String tempVal = arrOfStr[1];
+            switch (tempVal) {
+                case MONTH_JAN :
+                    mMonthEnd = 0;
+                    break;
+                case MONTH_FEB :
+                    mMonthEnd = 1;
+                    break;
+                case MONTH_MAR :
+                    mMonthEnd = 2;
+                    break;
+                case MONTH_APR :
+                    mMonthEnd = 3;
+                    break;
+                case MONTH_MAY :
+                    mMonthEnd = 4;
+                    break;
+                case MONTH_JUN :
+                    mMonthEnd = 5;
+                    break;
+                case MONTH_JUL :
+                    mMonthEnd = 6;
+                    break;
+                case MONTH_AUG :
+                    mMonthEnd = 7;
+                    break;
+                case MONTH_SEP :
+                    mMonthEnd = 8;
+                    break;
+                case MONTH_OCT :
+                    mMonthEnd = 9;
+                    break;
+                case MONTH_NOV :
+                    mMonthEnd = 10;
+                    break;
+                case MONTH_DEC :
+                    mMonthEnd = 11;
+                    break;
+            }
+
+            String tempDay = arrOfStr[0];
+            if (tempDay.startsWith("0")) {
+                mDayEnd = Integer.parseInt(tempDay.substring(1));
+            } else {
+                mDayEnd = Integer.parseInt(arrOfStr[0]);
+            }
+        }
+    }
+
     private void initView() {
         mConstraintLayoutMyView = findViewById(R.id.my_view);
         mRadioButtonCityBreak = findViewById(R.id.radio_button_city_break);
@@ -404,6 +648,118 @@ public class ManageTripActivity extends AppCompatActivity {
         mTextViewStatusCamera = findViewById(R.id.text_view_status_camera);
     }
 
+    private void saveToFirestore() {
+
+        //my DB object creation
+        Map<String, Object> userDatas = new HashMap<>();
+        userDatas.put(DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
+        userDatas.put(DB_DESTINATION, mEditTextDestination.getText().toString().trim()); //String
+        if (mRadioButtonCityBreak.isChecked()) {
+            userDatas.put(DB_TRIP_TYPE, CITY_BREAK); //String
+        }
+        else if (mRadioButtonSeaSide.isChecked()) {
+            userDatas.put(DB_TRIP_TYPE, SEA_SIDE); //String
+        }
+        else if (mRadioButtonMountains.isChecked()) {
+            userDatas.put(DB_TRIP_TYPE, MOUNTAINS); //String
+        }
+        userDatas.put(DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
+        userDatas.put(DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
+        userDatas.put(DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
+        //TODO de continuat objectul
+
+
+
+        //firestore saving...
+        db.collection(mUsernameMail)
+                .add(userDatas)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(ManageTripActivity.this, "Datas added succesfully", Toast.LENGTH_SHORT).show();
+                        //here to do the final mark...activate FINISH on timer //or maybe NOT
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ManageTripActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.e("TAG:", "Error occurred while creating the File: " + ex.getMessage());
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
+    private void setPic() {
+        // Get the dimensions of the View
+        //int targetW = imageView.getWidth();
+        //int targetH = imageView.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        //int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        //bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        mBitmapCamera = BitmapFactory.decodeFile(mCurrentPhotoPath);
+        //to set to a imageview
+        //imageView.setImageBitmap(bitmap);
+    }
+
     private void displayStartDateError() {
         Toast.makeText(ManageTripActivity.this, getString(R.string.wrong_start_date),
                 Toast.LENGTH_SHORT).show();
@@ -419,40 +775,40 @@ public class ManageTripActivity extends AppCompatActivity {
     private String getWordsOnMonth(int monthOfYear, String textMonth) {
         switch (monthOfYear) {
             case 0:
-                textMonth = "Jan";
+                textMonth = MONTH_JAN;
                 break;
             case 1:
-                textMonth = "Feb";
+                textMonth = MONTH_FEB;
                 break;
             case 2:
-                textMonth = "Mar";
+                textMonth = MONTH_MAR;
                 break;
             case 3:
-                textMonth = "Apr";
+                textMonth = MONTH_APR;
                 break;
             case 4:
-                textMonth = "May";
+                textMonth = MONTH_MAY;
                 break;
             case 5:
-                textMonth = "Jun";
+                textMonth = MONTH_JUN;
                 break;
             case 6:
-                textMonth = "Jul";
+                textMonth = MONTH_JUL;
                 break;
             case 7:
-                textMonth = "Aug";
+                textMonth = MONTH_AUG;
                 break;
             case 8:
-                textMonth = "Sep";
+                textMonth = MONTH_SEP;
                 break;
             case 9:
-                textMonth = "Oct";
+                textMonth = MONTH_OCT;
                 break;
             case 10:
-                textMonth = "Nov";
+                textMonth = MONTH_NOV;
                 break;
             case 11:
-                textMonth = "Dec";
+                textMonth = MONTH_DEC;
                 break;
         }
         return textMonth;
@@ -479,7 +835,7 @@ public class ManageTripActivity extends AppCompatActivity {
                 String text = dialogEditText.getText().toString();
 
                 if (text.isEmpty()) {
-                    dialogEditText.setError(getString(R.string.required_field));
+                    dialogEditText.setError(getString(R.string.value_is_missing));
                 } else if (text.startsWith("0")){
                     dialogEditText.setError(getString(R.string.invalid_price));
                 } else if (!text.startsWith("0") && Integer.valueOf(text) > maxVal) {
@@ -518,10 +874,10 @@ public class ManageTripActivity extends AppCompatActivity {
         }
 
         //for CAMERA
-        if (requestCode == CAMERA_CODE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            mBitmapCamera = (Bitmap) extras.get("data");
-            //mImageViewDisplayPicture.setImageBitmap(imageBitmap);
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+
+            galleryAddPic();
+            setPic();
 
             //for remove photo from selection
             if (mBitmapCamera != null) {
@@ -741,6 +1097,7 @@ public class ManageTripActivity extends AppCompatActivity {
         mSeekBarPrice.setEnabled(false);
         mButtonStartDate.setEnabled(false);
         mButtonEndDate.setEnabled(false);
+        mTextViewSetPrice.setEnabled(false);
         mRatingBarRating.setEnabled(false);
         mButtonSelectGalleryPhoto.setEnabled(false);
         mButtonSelectTakePicture.setEnabled(false);

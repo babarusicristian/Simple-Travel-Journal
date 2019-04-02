@@ -65,5 +65,8 @@
     <string name="invalid_price">Invalid price</string>
     <string name="out_of_range">Out of range</string>
     <string name="failed_to_load_image">Failed! to load image:</string>
+    <string name="value_is_missing">Value is missing</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 
 </resources>
