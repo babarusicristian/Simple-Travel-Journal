@@ -31,7 +31,6 @@ import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -51,9 +50,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
 import java.util.UUID;
-import cristian.babarusi.simpletraveljournal.recyclerViewSources.DestinationsAdapter;
+
 import cristian.babarusi.simpletraveljournal.utils.KeyboardUtils;
 import cristian.babarusi.simpletraveljournal.utils.Logging;
 import cristian.babarusi.simpletraveljournal.utils.Snack;
@@ -117,15 +115,9 @@ public class ManageTripActivity extends AppCompatActivity {
     //for firestore (cloud database)
     FirebaseFirestore db;
 
-    //for store datas (rest fields retrive value directly)
+    //for store datas (rest of fields retrive values directly)
     private float mRating;
-    private String mUrlDownloadLink;
-    private String mFileReference;
-
     Map<String, Object> mUserDatas;
-
-    private Timer mTimerChecking;
-    private boolean mFlagOK = false;
 
     //for use on DB read and write
     private static final String DB_TRIP_NAME = "db_tripName";
@@ -144,6 +136,10 @@ public class ManageTripActivity extends AppCompatActivity {
     private static final String CITY_BREAK = "cityBreak";
     private static final String SEA_SIDE = "seaSide";
     private static final String MOUNTAINS = "mountains";
+
+    private static final String CAMERA_REF_IDENTITY = "CAMERA";
+    private static final String GALLERY_REF_IDENTITY = "GALLERY";
+    private static final String NONE_REF_IDENTITY = "NONE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,8 +164,9 @@ public class ManageTripActivity extends AppCompatActivity {
         //receiving data from recycler view (trip list)
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            mEditTextTripName.setText(bundle.getString(DestinationsAdapter.KEY_TITLE));
-            mEditTextDestination.setText(bundle.getString(DestinationsAdapter.KEY_SUBTITLE));
+
+            //mEditTextTripName.setText(bundle.getString(DestinationsAdapter.KEY_TITLE));
+            //mEditTextDestination.setText(bundle.getString(DestinationsAdapter.KEY_SUBTITLE));
         }
 
         mRadioButtonCityBreak.setOnClickListener(new View.OnClickListener() {
@@ -713,15 +710,15 @@ public class ManageTripActivity extends AppCompatActivity {
             mUserDatas.put(DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
             mUserDatas.put(DB_RATING, mRating); //number (double)
             if (mBitmapGallery != null) {
-                mUserDatas.put(DB_REF_IDENTITY, "GALLERY"); //String
+                mUserDatas.put(DB_REF_IDENTITY, GALLERY_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapGallery = null; //moved after is saved in DB
             } else if (mBitmapCamera != null) {
-                mUserDatas.put(DB_REF_IDENTITY, "CAMERA"); //String
+                mUserDatas.put(DB_REF_IDENTITY, CAMERA_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapCamera = null;
             } else {
-                mUserDatas.put(DB_REF_IDENTITY, "NONE");
+                mUserDatas.put(DB_REF_IDENTITY, NONE_REF_IDENTITY);
             }
             mUserDatas.put(DB_FAVORITE, false); //boolean
             mUserDatas.put(DB_URL_IMAGE, null);
@@ -748,15 +745,15 @@ public class ManageTripActivity extends AppCompatActivity {
             mUserDatas.put(DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
             mUserDatas.put(DB_RATING, mRating); //number (double)
             if (mBitmapGallery != null) {
-                mUserDatas.put(DB_REF_IDENTITY, "GALLERY"); //String
+                mUserDatas.put(DB_REF_IDENTITY, GALLERY_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapGallery = null; //moved after is saved in DB
             } else if (mBitmapCamera != null) {
-                mUserDatas.put(DB_REF_IDENTITY, "CAMERA"); //String
+                mUserDatas.put(DB_REF_IDENTITY, CAMERA_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapCamera = null;
             } else {
-                mUserDatas.put(DB_REF_IDENTITY, "NONE");
+                mUserDatas.put(DB_REF_IDENTITY, NONE_REF_IDENTITY);
             }
             mUserDatas.put(DB_FAVORITE, false); //boolean
         }

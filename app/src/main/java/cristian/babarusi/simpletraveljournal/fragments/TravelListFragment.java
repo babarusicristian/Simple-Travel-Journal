@@ -10,23 +10,57 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import cristian.babarusi.simpletraveljournal.ManageTripActivity;
 import cristian.babarusi.simpletraveljournal.R;
-import cristian.babarusi.simpletraveljournal.recyclerViewSources.Destinations;
-import cristian.babarusi.simpletraveljournal.recyclerViewSources.DestinationsAdapter;
+import cristian.babarusi.simpletraveljournal.recyclerViewSources.TripAdapter;
+import cristian.babarusi.simpletraveljournal.recyclerViewSources.TripModel;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class TravelListFragment extends Fragment {
 
-    private RecyclerView mRecyclerViewTravel;
     private FloatingActionButton mFloatingActionButtonAdd;
     private FragmentActivity fragmentActivity;
+
+    //for firestore (cloud database)
+    private FirebaseFirestore db;
+    private CollectionReference mUserReference;
+    private TripAdapter mAdapter;
+
+    //for firebase use
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+
+    private String mUsernameMail;
+
+    //for use on DB read and write
+    private static final String DB_TRIP_NAME = "db_tripName";
+    private static final String DB_DESTINATION = "db_destination";
+    private static final String DB_TRIP_TYPE = "db_tripType";
+    private static final String DB_PRICE_EURO = "db_priceEuro";
+    private static final String DB_START_DATE = "db_startDate";
+    private static final String DB_END_DATE = "db_endDate";
+    private static final String DB_RATING = "db_rating";
+    private static final String DB_URL_IMAGE = "db_urlImage";
+    private static final String DB_FAVORITE = "db_favorite";
+    private static final String DB_START_DATE_MILISEC = "db_startDateMilisec";
+    private static final String DB_FILE_REFERENCE = "db_fileReference";
+    private static final String DB_REF_IDENTITY = "db_refIdentity";
+
+    private static final String CITY_BREAK = "cityBreak";
+    private static final String SEA_SIDE = "seaSide";
+    private static final String MOUNTAINS = "mountains";
+
+    private static final String CAMERA_REF_IDENTITY = "CAMERA";
+    private static final String GALLERY_REF_IDENTITY = "GALLERY";
+    private static final String NONE_REF_IDENTITY = "NONE";
 
     public TravelListFragment() {
         // Required empty public constructor
@@ -39,11 +73,17 @@ public class TravelListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_travel_list, container, false);
 
         initView(view);
+        retriveUserMail();
+        //initialize firestore DB
+        db = FirebaseFirestore.getInstance();
+        mUserReference = db.collection(mUsernameMail);
+
+        setUpRecyclerView(view);
 
         mFloatingActionButtonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentManageTrip = new Intent(fragmentActivity, ManageTripActivity.class);
+                Intent intentManageTrip = new Intent(getActivity(), ManageTripActivity.class);
                 startActivity(intentManageTrip);
             }
         });
@@ -51,65 +91,43 @@ public class TravelListFragment extends Fragment {
         return view;
     }
 
+    private void setUpRecyclerView(View view) {
+        Query query = mUserReference.orderBy(DB_RATING, Query.Direction.DESCENDING);
+        FirestoreRecyclerOptions<TripModel> options = new FirestoreRecyclerOptions.Builder<TripModel>()
+                .setQuery(query, TripModel.class).build();
+
+        mAdapter = new TripAdapter(options);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_travel);
+        recyclerView.setHasFixedSize(true);
+        //se poate si cu this(daca nu ai fragment)
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAdapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAdapter.stopListening();
+    }
+
     private void initView(View view) {
-        mRecyclerViewTravel = view.findViewById(R.id.recycler_view_travel);
-        fragmentActivity = getActivity();
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(fragmentActivity);
-        mRecyclerViewTravel.setLayoutManager(layoutManager);
-        DestinationsAdapter destinationsAdapter = new DestinationsAdapter(fragmentActivity,
-                getDestinationsSource());
-        mRecyclerViewTravel.setAdapter(destinationsAdapter);
         mFloatingActionButtonAdd = view.findViewById(R.id.floating_action_button_add);
     }
 
-    private List<Destinations> getDestinationsSource() {
-        List<Destinations> destinationsList = new ArrayList<>();
-        Destinations dest;
 
-        //TODO to use FireBase
+    private void retriveUserMail() {
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        dest = new Destinations();
-        dest.setTripNameTitle("Holiday 2017");
-        dest.setDestinationSubtitle("Islands");
-        dest.setPicture(R.drawable.islands);
-        destinationsList.add(dest);
-
-        dest = new Destinations();
-        dest.setTripNameTitle("Fall 2017");
-        dest.setDestinationSubtitle("Rome");
-        dest.setPicture(R.drawable.rome);
-        destinationsList.add(dest);
-
-        dest = new Destinations();
-        dest.setTripNameTitle("Summer 2017");
-        dest.setDestinationSubtitle("London");
-        dest.setPicture(R.drawable.london);
-        destinationsList.add(dest);
-
-        dest = new Destinations();
-        dest.setTripNameTitle("Winter 2017");
-        dest.setDestinationSubtitle("Paris");
-        dest.setPicture(R.drawable.paris);
-        destinationsList.add(dest);
-
-        dest = new Destinations();
-        dest.setTripNameTitle("Spring 2018");
-        dest.setDestinationSubtitle("San Francisco");
-        dest.setPicture(R.drawable.san_francisco);
-        destinationsList.add(dest);
-
-        dest = new Destinations();
-        dest.setTripNameTitle("Summer 2018");
-        dest.setDestinationSubtitle("Greece");
-        dest.setPicture(R.drawable.greece);
-        destinationsList.add(dest);
-
-        dest = new Destinations();
-        dest.setTripNameTitle("Summer 2018");
-        dest.setDestinationSubtitle("Cairo");
-        dest.setPicture(R.drawable.cairo);
-        destinationsList.add(dest);
-
-        return destinationsList;
+        if (mFirebaseUser != null) {
+            mUsernameMail = mFirebaseUser.getEmail();
+        }
     }
 }

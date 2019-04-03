@@ -68,5 +68,6 @@
     <string name="value_is_missing">Value is missing</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="demo_rating_x_x">Rating: x.x</string>
 
 </resources>

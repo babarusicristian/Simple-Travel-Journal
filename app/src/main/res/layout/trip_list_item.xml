@@ -28,41 +28,44 @@
         android:background="@drawable/item_background_ripple_effect">
 
         <ImageView
-            android:id="@+id/image_view_travel_list_picture"
+            android:id="@+id/image_view_item_image"
             android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_height="0dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:background="@drawable/item_background_ripple_effect2"
             android:contentDescription="@null"
             android:padding="2dp"
-            android:scaleType="fitXY"
+            android:scaleType="fitCenter"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
-            android:id="@+id/text_view_trip_name_title"
-            android:layout_width="wrap_content"
+            android:id="@+id/text_view_item_trip_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/demo_trip_name_title"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/image_view_travel_list_picture"
-            app:layout_constraintTop_toTopOf="@+id/image_view_travel_list_picture" />
+            app:layout_constraintEnd_toStartOf="@+id/image_view_item_favicon"
+            app:layout_constraintStart_toEndOf="@+id/image_view_item_image"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/text_view_destination_subtitle"
+            android:id="@+id/text_view_item_destination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="@string/demo_destination_subtitle"
-            app:layout_constraintStart_toStartOf="@+id/text_view_trip_name_title"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_trip_name_title" />
+            app:layout_constraintStart_toStartOf="@+id/text_view_item_trip_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_item_trip_name" />
 
         <LinearLayout
             android:id="@+id/linearLayout3"
@@ -98,8 +101,32 @@
                 android:textSize="@dimen/font_13"
                 android:textStyle="bold" />
 
-
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/image_view_item_favicon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/item_background_ripple_effect3"
+            android:clickable="true"
+            android:contentDescription="@null"
+            android:focusable="true"
+            android:padding="@dimen/space_8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_favorite_false" />
+
+        <TextView
+            android:id="@+id/text_view_item_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/demo_rating_x_x"
+            android:textSize="@dimen/font_12"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+            app:layout_constraintStart_toStartOf="@+id/text_view_item_destination"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_item_destination" />
 
 
     </android.support.constraint.ConstraintLayout>
