@@ -23,18 +23,19 @@
 
     <include layout="@layout/content_main_navigation_drawer" />
 
-    <!--
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_button_add"
+        android:id="@+id/floating_action_button_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:backgroundTint="#cce8cc"
+        android:backgroundTint="@color/fab_backgorund"
+        app:rippleColor="@color/blue_ripple"
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/ic_add"
-        app:fabSize="normal" />
-        -->
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.design.widget.CoordinatorLayout>

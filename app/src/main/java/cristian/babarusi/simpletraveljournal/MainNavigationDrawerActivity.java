@@ -3,6 +3,7 @@ package cristian.babarusi.simpletraveljournal;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -47,6 +48,7 @@ public class MainNavigationDrawerActivity extends AppCompatActivity
     private TextView mTextViewTitleUsername;
     private TextView mTextViewTitleUsernameMail;
     private ImageView mImageViewUserImage;
+    private FloatingActionButton mFloatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,14 @@ public class MainNavigationDrawerActivity extends AppCompatActivity
         initView();
         initFirebaseAndDisplayData();
         initGoogleClient();
+        mFloatingActionButton = findViewById(R.id.floating_action_button_add);
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentManageTrip = new Intent(MainNavigationDrawerActivity.this, ManageTripActivity.class);
+                startActivity(intentManageTrip);
+            }
+        });
     }
 
     private void initView() {

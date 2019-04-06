@@ -1,7 +1,5 @@
 package cristian.babarusi.simpletraveljournal.recyclerViewSources;
 
-import android.content.Context;
-
 public class TripModel {
 
     //used to represent fields from the recyclerView item
@@ -17,7 +15,7 @@ public class TripModel {
     }
 
     //my custom constructor to initialize variables
-    public TripModel(Context context, String tripName, String destination, String imageUrl, float rating, boolean flagFav) {
+    public TripModel(String tripName, String destination, String imageUrl, float rating, boolean flagFav) {
         this.mTripName = tripName;
         this.mDestination = destination;
         this.mImageUrl = imageUrl;

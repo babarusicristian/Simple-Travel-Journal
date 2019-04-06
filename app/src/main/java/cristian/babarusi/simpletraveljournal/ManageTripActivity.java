@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import cristian.babarusi.simpletraveljournal.utils.Constants;
 import cristian.babarusi.simpletraveljournal.utils.KeyboardUtils;
 import cristian.babarusi.simpletraveljournal.utils.Logging;
 import cristian.babarusi.simpletraveljournal.utils.Snack;
@@ -119,28 +120,6 @@ public class ManageTripActivity extends AppCompatActivity {
     private float mRating;
     Map<String, Object> mUserDatas;
 
-    //for use on DB read and write
-    private static final String DB_TRIP_NAME = "db_tripName";
-    private static final String DB_DESTINATION = "db_destination";
-    private static final String DB_TRIP_TYPE = "db_tripType";
-    private static final String DB_PRICE_EURO = "db_priceEuro";
-    private static final String DB_START_DATE = "db_startDate";
-    private static final String DB_END_DATE = "db_endDate";
-    private static final String DB_RATING = "db_rating";
-    private static final String DB_URL_IMAGE = "db_urlImage";
-    private static final String DB_FAVORITE = "db_favorite";
-    private static final String DB_START_DATE_MILISEC = "db_startDateMilisec";
-    private static final String DB_FILE_REFERENCE = "db_fileReference";
-    private static final String DB_REF_IDENTITY = "db_refIdentity";
-
-    private static final String CITY_BREAK = "cityBreak";
-    private static final String SEA_SIDE = "seaSide";
-    private static final String MOUNTAINS = "mountains";
-
-    private static final String CAMERA_REF_IDENTITY = "CAMERA";
-    private static final String GALLERY_REF_IDENTITY = "GALLERY";
-    private static final String NONE_REF_IDENTITY = "NONE";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,7 +139,7 @@ public class ManageTripActivity extends AppCompatActivity {
         //initialize firestore DB
         db = FirebaseFirestore.getInstance();
 
-
+        //TODO de revenit aici (will need the ID to manipulate rest of datas)
         //receiving data from recycler view (trip list)
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -489,15 +468,8 @@ public class ManageTripActivity extends AppCompatActivity {
                     return;
                 }
 
-
-                //PORNESTE-LE
                 blockAllActivityProgressBar();
-
                 saveToFirestore();
-//
-//                uploadGalleryImageToStorage();
-//                uploadCameraImageToStorage();
-
             }
         });
 
@@ -695,67 +667,67 @@ public class ManageTripActivity extends AppCompatActivity {
         if (mBitmapGallery == null && mBitmapCamera == null)
         {
             //dont upload any images
-            mUserDatas.put(DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
-            mUserDatas.put(DB_DESTINATION, mEditTextDestination.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_DESTINATION, mEditTextDestination.getText().toString().trim()); //String
             if (mRadioButtonCityBreak.isChecked()) {
-                mUserDatas.put(DB_TRIP_TYPE, CITY_BREAK); //String
+                mUserDatas.put(Constants.DB_TRIP_TYPE, Constants.CITY_BREAK); //String
             } else if (mRadioButtonSeaSide.isChecked()) {
-                mUserDatas.put(DB_TRIP_TYPE, SEA_SIDE); //String
+                mUserDatas.put(Constants.DB_TRIP_TYPE, Constants.SEA_SIDE); //String
             } else if (mRadioButtonMountains.isChecked()) {
-                mUserDatas.put(DB_TRIP_TYPE, MOUNTAINS); //String
+                mUserDatas.put(Constants.DB_TRIP_TYPE, Constants.MOUNTAINS); //String
             }
-            mUserDatas.put(DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
-            mUserDatas.put(DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
-            mUserDatas.put(DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
-            mUserDatas.put(DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
-            mUserDatas.put(DB_RATING, mRating); //number (double)
+            mUserDatas.put(Constants.DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
+            mUserDatas.put(Constants.DB_RATING, mRating); //number (double)
             if (mBitmapGallery != null) {
-                mUserDatas.put(DB_REF_IDENTITY, GALLERY_REF_IDENTITY); //String
+                mUserDatas.put(Constants.DB_REF_IDENTITY, Constants.GALLERY_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapGallery = null; //moved after is saved in DB
             } else if (mBitmapCamera != null) {
-                mUserDatas.put(DB_REF_IDENTITY, CAMERA_REF_IDENTITY); //String
+                mUserDatas.put(Constants.DB_REF_IDENTITY, Constants.CAMERA_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapCamera = null;
             } else {
-                mUserDatas.put(DB_REF_IDENTITY, NONE_REF_IDENTITY);
+                mUserDatas.put(Constants.DB_REF_IDENTITY, Constants.NONE_REF_IDENTITY);
             }
-            mUserDatas.put(DB_FAVORITE, false); //boolean
-            mUserDatas.put(DB_URL_IMAGE, null);
-            mUserDatas.put(DB_FILE_REFERENCE, null);
+            mUserDatas.put(Constants.DB_FAVORITE, false); //boolean
+            mUserDatas.put(Constants.DB_URL_IMAGE, null);
+            mUserDatas.put(Constants.DB_FILE_REFERENCE, null);
 
             addToDatabase();
         } else {
             uploadCameraImageToStorage();
             uploadGalleryImageToStorage();
 
-            mUserDatas.put(DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
-            mUserDatas.put(DB_DESTINATION, mEditTextDestination.getText().toString().trim());
+            mUserDatas.put(Constants.DB_TRIP_NAME, mEditTextTripName.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_DESTINATION, mEditTextDestination.getText().toString().trim());
             //String
             if (mRadioButtonCityBreak.isChecked()) {
-                mUserDatas.put(DB_TRIP_TYPE, CITY_BREAK); //String
+                mUserDatas.put(Constants.DB_TRIP_TYPE, Constants.CITY_BREAK); //String
             } else if (mRadioButtonSeaSide.isChecked()) {
-                mUserDatas.put(DB_TRIP_TYPE, SEA_SIDE); //String
+                mUserDatas.put(Constants.DB_TRIP_TYPE, Constants.SEA_SIDE); //String
             } else if (mRadioButtonMountains.isChecked()) {
-                mUserDatas.put(DB_TRIP_TYPE, MOUNTAINS); //String
+                mUserDatas.put(Constants.DB_TRIP_TYPE, Constants.MOUNTAINS); //String
             }
-            mUserDatas.put(DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
-            mUserDatas.put(DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
-            mUserDatas.put(DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
-            mUserDatas.put(DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
-            mUserDatas.put(DB_RATING, mRating); //number (double)
+            mUserDatas.put(Constants.DB_PRICE_EURO, mTextViewPrice.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_START_DATE, mButtonStartDate.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_END_DATE, mButtonEndDate.getText().toString().trim()); //String
+            mUserDatas.put(Constants.DB_START_DATE_MILISEC, mStartDateMiliseconds); //number (long)
+            mUserDatas.put(Constants.DB_RATING, mRating); //number (double)
             if (mBitmapGallery != null) {
-                mUserDatas.put(DB_REF_IDENTITY, GALLERY_REF_IDENTITY); //String
+                mUserDatas.put(Constants.DB_REF_IDENTITY, Constants.GALLERY_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapGallery = null; //moved after is saved in DB
             } else if (mBitmapCamera != null) {
-                mUserDatas.put(DB_REF_IDENTITY, CAMERA_REF_IDENTITY); //String
+                mUserDatas.put(Constants.DB_REF_IDENTITY, Constants.CAMERA_REF_IDENTITY); //String
                 //clear image from memory (prevent OutOfMemoryError crash BUG)
                 mBitmapCamera = null;
             } else {
-                mUserDatas.put(DB_REF_IDENTITY, NONE_REF_IDENTITY);
+                mUserDatas.put(Constants.DB_REF_IDENTITY, Constants.NONE_REF_IDENTITY);
             }
-            mUserDatas.put(DB_FAVORITE, false); //boolean
+            mUserDatas.put(Constants.DB_FAVORITE, false); //boolean
         }
     }
 
@@ -807,28 +779,14 @@ public class ManageTripActivity extends AppCompatActivity {
     }
 
     private void setPic() {
-        // Get the dimensions of the View
-        //int targetW = imageView.getWidth();
-        //int targetH = imageView.getHeight();
-
         // Get the dimensions of the bitmap
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(mCurrentPhotoPath);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        //int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
-        //bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
-
         mBitmapCamera = BitmapFactory.decodeFile(mCurrentPhotoPath);
-        //to set to a imageview
-        //imageView.setImageBitmap(bitmap);
     }
 
     private void displayStartDateError() {
@@ -927,8 +885,6 @@ public class ManageTripActivity extends AppCompatActivity {
         });
 
         theDialog.show();
-
-
     }
 
     private void loseEditTextsFocus() {
@@ -1018,8 +974,8 @@ public class ManageTripActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
 
-                            mUserDatas.put(DB_URL_IMAGE, uri.toString());
-                            mUserDatas.put(DB_FILE_REFERENCE, storageReference.getName());
+                            mUserDatas.put(Constants.DB_URL_IMAGE, uri.toString());
+                            mUserDatas.put(Constants.DB_FILE_REFERENCE, storageReference.getName());
 
                             String url = uri.toString();
                             Logging.show(ManageTripActivity.this, "the url is: " + url);
@@ -1063,8 +1019,8 @@ public class ManageTripActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
 
-                            mUserDatas.put(DB_URL_IMAGE, uri.toString());
-                            mUserDatas.put(DB_FILE_REFERENCE, storageReference.getName());
+                            mUserDatas.put(Constants.DB_URL_IMAGE, uri.toString());
+                            mUserDatas.put(Constants.DB_FILE_REFERENCE, storageReference.getName());
 
                             String url = uri.toString();
                             Logging.show(ManageTripActivity.this, "the url is: " + url);
@@ -1090,10 +1046,6 @@ public class ManageTripActivity extends AppCompatActivity {
             int myDstHeight = mBitmapGallery.getHeight();
             double temp;
 
-            //verification
-            //Log.e("TAG:" , "INITIAL img width:" + bitmap.getWidth());
-            //Log.e("TAG:" , "INITIAL img height:" + bitmap.getHeight());
-
             int width = mBitmapGallery.getWidth();
             int height = mBitmapGallery.getHeight();
 
@@ -1116,10 +1068,6 @@ public class ManageTripActivity extends AppCompatActivity {
             }
 
             mBitmapGallery = Bitmap.createScaledBitmap(mBitmapGallery, myDstWidth, myDstHeight, true);
-
-            //verification
-            //Log.e("TAG:" , "AFTER scale - img width:" + bitmap.getWidth());
-            //Log.e("TAG:" , "AFTER scale - img height:" + bitmap.getHeight());
         }
     }
 
@@ -1131,10 +1079,6 @@ public class ManageTripActivity extends AppCompatActivity {
             int myDstWidth = mBitmapCamera.getWidth();
             int myDstHeight = mBitmapCamera.getHeight();
             double temp;
-
-            //verification
-            //Log.e("TAG:" , "INITIAL img width:" + bitmap.getWidth());
-            //Log.e("TAG:" , "INITIAL img height:" + bitmap.getHeight());
 
             int width = mBitmapCamera.getWidth();
             int height = mBitmapCamera.getHeight();
@@ -1158,10 +1102,6 @@ public class ManageTripActivity extends AppCompatActivity {
             }
 
             mBitmapCamera = Bitmap.createScaledBitmap(mBitmapCamera, myDstWidth, myDstHeight, true);
-
-            //verification
-            //Log.e("TAG:" , "AFTER scale - img width:" + bitmap.getWidth());
-            //Log.e("TAG:" , "AFTER scale - img height:" + bitmap.getHeight());
         }
     }
 
