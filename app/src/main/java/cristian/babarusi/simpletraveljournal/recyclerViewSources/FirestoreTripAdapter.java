@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.google.firebase.firestore.Query;
 import cristian.babarusi.simpletraveljournal.R;
+import cristian.babarusi.simpletraveljournal.utils.Constants;
 
 public class FirestoreTripAdapter extends FirestoreAdapter<TripHolder> {
 
@@ -30,15 +31,11 @@ public class FirestoreTripAdapter extends FirestoreAdapter<TripHolder> {
     @Override
     public void onBindViewHolder(@NonNull final TripHolder tripsViewHolder, final int i) {
 
-
-        tripsViewHolder.mTextViewTripName.setText(getSnapshot(i).getString("db_tripName"));
-        tripsViewHolder.mTextViewDestination.setText(getSnapshot(i).getString("db_destination"));
-        Double tempRating = getSnapshot(i).getDouble("db_rating");
+        tripsViewHolder.mTextViewTripName.setText(getSnapshot(i).getString(Constants.DB_TRIP_NAME));
+        tripsViewHolder.mTextViewDestination.setText(getSnapshot(i).getString(Constants.DB_DESTINATION));
+        Double tempRating = getSnapshot(i).getDouble(Constants.DB_RATING);
 
         tripsViewHolder.mTextViewRating.setText(String.valueOf(tempRating));
-
-
-
 
         // Click listener
         tripsViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -58,9 +55,5 @@ public class FirestoreTripAdapter extends FirestoreAdapter<TripHolder> {
                 return true;
             }
         });
-
-
     }
-
-
 }
